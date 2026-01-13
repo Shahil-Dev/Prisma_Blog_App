@@ -12,21 +12,57 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
-}
+
+// model User {
+//   id    Int     @id @default(autoincrement())
+//   email String  @unique
+//   name  String?
+//   posts Post[]
+// }
 
 model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
+  id           String     @id @default(uuid())
+  title        String     @db.VarChar(255)
+  content      String     @db.Text
+  thumbnailUrl String?    @db.VarChar(512)
+  isFeatured   Boolean    @default(false)
+  status       PostStatus @default(DRAFT)
+  tags         String[]
+  viewCount    Int        @default(0)
+  authorId     String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  comments     Comment[]
+
+  @@index([authorId])
+  @@map("posts")
 }
 
+model Comment {
+  id        String    @id @default(uuid())
+  postId    String
+  post      Post      @relation(fields: [postId], references: [id])
+  authorId  String
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+  status    String    @default("APPROVED")
+  content   String    @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
+  @@index([postId])
+  @@index([authorId])
+  @@map("comments")
+}
 
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CommentStatus {
+  APPROVED
+  REJECTED
+}
