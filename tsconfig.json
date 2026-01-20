@@ -1,4 +1,4 @@
- {
+{
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
@@ -39,7 +39,9 @@
     "esModuleInterop": true,
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "src/Server.ts",
+    "src/App.ts"
   ],
   "exclude": [
     "node_modules",
